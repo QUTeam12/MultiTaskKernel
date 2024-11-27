@@ -1,0 +1,7 @@
+*.LIS
+*.abs
+*.map
+*.o
+*.glis
+*.hex
+*.swp

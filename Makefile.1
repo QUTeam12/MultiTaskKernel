@@ -1,0 +1,16 @@
+################################################################
+### Software Jikken -- Makefile for C Jikken theme 1
+### Yoshinari Nomura <nom@csce.kyushu-u.ac.jp>
+### $Id: Makefile.1,v 1.2 2001/12/19 06:00:09 nom Exp $
+################################################################
+
+PROGRAM		= test1
+
+# mon.o must be first so that ld places mon.o $400.
+
+OBJECTS		= crt0.o mon.o inchrw.o outchr.o csys68k.o test1.o
+SRCS		= crt0.s mon.s inchrw.s outchr.s csys68k.c test1.c
+ASMGLIS		= crt0.glis mon.glis inchrw.glis outchr.glis \
+			csys68k.glis test1.glis
+
+include $(LIB_JIKKEN)/make.conf
