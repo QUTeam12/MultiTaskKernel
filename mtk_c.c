@@ -1,11 +1,11 @@
 #include "mtk_c.h"
-
+#include <stdio.h>
 
 typedef int TASK_ID_TYPE;
 
 typedef struct {
 	int count;
-	int nst; /+ reserved +/
+	int nst; 
 	TASK_ID_TYPE task_list;
 } SEMAPHORE_TYPE;
 
@@ -31,20 +31,20 @@ STACK_TYPE	stacks[NUMTASK];
 void init_kernel(){
 
 	//TCV配列の初期化
-	for(i=0; i< NUMTASK;i++){
-		task_tab[i].task_addr	=NULL
-		task_tab[i].stack_ptr	=NULL
-		task_tab[i].priority 	=NULL
-		task_tab[i].status	=NULL
+	for(int i=0; i< NUMTASK;i++){
+		task_tab[i].task_addr	=NULL;
+		task_tab[i].stack_ptr	=NULL;
+		task_tab[i].priority 	=NULL;
+		task_tab[i].status	=NULL;
 	}
 	//readyキューの初期化
-	TASK_ID_TYPE=NULLTASKID
+	TASK_ID_TYPE ready = NULLTASKID;
 	//[TODO]PVシステムコールの割り込み処理ルーチン(pv_handler)をTRAP1の割り込みベクタに登録する
 	//セマフォの値を初期化
-	for(i=0; i< NUMSEMAPHORE;i++){
-		semaphore[i].count	=NULL
-		semaphore[i].nst	=NULL
-		semaphore[i].task_list 	=NULL
+	for(int i=0; i< NUMSEMAPHORE;i++){
+		semaphore[i].count	=NULL;
+		semaphore[i].nst	=NULL;
+		semaphore[i].task_list 	=NULL;
 	}
 
 
