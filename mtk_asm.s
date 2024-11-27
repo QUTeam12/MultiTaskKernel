@@ -1,5 +1,8 @@
 .global P
 .global V
+.global pv_handler
+.extern p_body
+.extern v_body
 .section .text
 .even
 ********************
