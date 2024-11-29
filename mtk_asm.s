@@ -1,3 +1,4 @@
+.include "equdefs.inc"
 .global P
 .global V
 .global pv_handler
@@ -71,8 +72,9 @@ pv_handler_end:
  hard_clock:
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.l  curr_task, -(%sp)
-	move.l  #ready, -(%sp)
+	move.l  ready, -(%sp)
 	jsr     addq
+ 	addi.l  #8, %sp
 	jsr     sched
 	jsr     swtch
 	movem.l (%sp)+, %d0-%d7/%a0-%a6
