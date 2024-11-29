@@ -16,7 +16,7 @@ typedef struct {
 	void (*task_addr)(); // タスクの関数ポインタ
 	void *stack_ptr; // タスク毎にユーザスタックとスーパーバイザスタックを分けるスタックのポインタ
 	int priority; // 優先度。今回は使わない。
-	int status; // TCBの使用状態。今回は使わない。.hでUNDEFINEDを定義していれたいかも。
+	int status; // TCBの使用状態。今回は使わない。
 	TASK_ID_TYPE next; // セマフォかreadyキューの次のタスクID
 } TCB_TYPE;
 
@@ -36,6 +36,7 @@ void init_kernel() {
 		task_tab[i].stack_ptr = NULL;
 		task_tab[i].priority = UNDEFINED;
 		task_tab[i].status = UNDEFINED;
+		task_tab[i].next = NULLTASKID;
 	}
 	// readyキューの初期化
 	TASK_ID_TYPE ready = NULLTASKID;
