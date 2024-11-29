@@ -50,3 +50,20 @@ void init_kernel() {
 	}
 }
 
+
+//semaphore
+void p_body(int semaphoreId){
+	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
+	if(semaphore[semaphoreId].count < 0){
+		// タスクを休眠状態に
+		sleep(semaphoreId);
+	}
+}
+
+void v_body(int semaphoreId){
+	semaphore[semaphoreId].count += 1;
+	if(semaphore[semaphoreId].count <= 0){
+		wakeup(semaphoreId);
+	}
+}
+
