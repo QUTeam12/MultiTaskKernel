@@ -29,6 +29,11 @@ typedef struct {
 
 STACK_TYPE	stacks[NUMTASK]; // stacks[0]からID=1のタスクを割り振る
 
+int curr_task;
+int new_task;
+int next_task;
+TASK_ID_TYPE ready;
+
 void init_kernel() {
 	// TCB配列の初期化
 	for(int i=1; i <= NUMTASK; i++){
