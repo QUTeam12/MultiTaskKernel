@@ -1,5 +1,8 @@
 #include "mtk_c.h"
 #include <stdio.h>
+
+extern void first_task();
+extern void init_timer();
 extern void pv_handler();
 
 typedef int TASK_ID_TYPE;
@@ -71,5 +74,12 @@ void set_task(void (*user_task_func)()) {
 void* init_stack(TASK_ID_TYPE id) {
     void *ssp;
     return ssp;
+}
+
+void begin_sch() {
+	// 最初のタスクとタイマを設定してタスク起動
+	curr_task = removeq(); // TODO: 引数わかんない
+	init_timer();
+	first_task();
 }
 
