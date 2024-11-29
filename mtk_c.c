@@ -30,7 +30,7 @@ typedef struct {
 STACK_TYPE	stacks[NUMTASK]; // stacks[0]からID=1のタスクを割り振る
 
 void init_kernel() {
-	// TCV配列の初期化
+	// TCB配列の初期化
 	for(int i=1; i <= NUMTASK; i++){
 		task_tab[i].task_addr = NULL;
 		task_tab[i].stack_ptr = NULL;
