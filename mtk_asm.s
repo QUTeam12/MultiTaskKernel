@@ -1,8 +1,17 @@
+.include "equdefs.inc"
 .global P
 .global V
 .global pv_handler
+.global hard_clock
+.global init_timer
 .extern p_body
 .extern v_body
+.extern curr_task
+.extern ready
+.extern addq
+.extern sched
+.extern swtch
+
 .section .text
 .even
 ********************
@@ -56,3 +65,28 @@ pv_handler_end:
 	move.w (%sp)+, %sr	/*走行レベル回復*/
 	movem.l (%sp)+, %d0-%d1/*　レジスタ復帰*/
 	rte
+
+*****************************
+**hard_clock
+*****************************
+ hard_clock:
+	movem.l %d0-%d7/%a0-%a6, -(%sp)
+	move.l  curr_task, -(%sp)
+	move.l  ready, -(%sp)
+	jsr     addq
+ 	addi.l  #8, %sp
+	jsr     sched
+	jsr     swtch
+	movem.l (%sp)+, %d0-%d7/%a0-%a6
+	rts
+
+*******************************
+**init_timer
+*******************************
+init_timer:
+	move.l #SYSCALL_NUM_SET_TIMER, %D0
+	move.w  #0x64, %d1 /* Linux周期。10ms */
+	** move.w  #0x2710, %d1 /* 動作確認用。1sec。 */
+	move.l  #hard_clock, %d2
+	trap #0
+	rts
