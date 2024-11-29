@@ -52,21 +52,6 @@ void init_kernel() {
 
 
 //semaphore
-void p_body(int semaphoreId){
-	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
-	if(semaphore[semaphoreId].count < 0){
-		// タスクを休眠状態に
-		sleep(semaphoreId);
-	}
-}
-
-void v_body(int semaphoreId){
-	semaphore[semaphoreId].count += 1;
-	if(semaphore[semaphoreId].count <= 0){
-		wakeup(semaphoreId);
-	}
-}
-
 // タスクを休眠状態にする関数
 void sleep(int ch){
 	task_tab[curr_task].next = semaphore[ch].task_list;  // セマフォの先頭に実行中タスクを追加
@@ -85,3 +70,19 @@ void wakeup(int ch){
 		ready = task;  					// readyの更新
 	}
 }
+
+void p_body(int semaphoreId){
+	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
+	if(semaphore[semaphoreId].count < 0){
+		// タスクを休眠状態に
+		sleep(semaphoreId);
+	}
+}
+
+void v_body(int semaphoreId){
+	semaphore[semaphoreId].count += 1;
+	if(semaphore[semaphoreId].count <= 0){
+		wakeup(semaphoreId);
+	}
+}
+
