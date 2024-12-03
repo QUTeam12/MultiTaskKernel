@@ -4,3 +4,7 @@
 #define STKSIZE 8000 // スタックサイズ
 #define UNDEFINED 0 // int型フィールドの初期化用
 
+// TCB_TYPE.status
+#define TCB_UNDEFINED 0
+#define TCB_ACTIVE 1
+#define TCB_FINISH 2
