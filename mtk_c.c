@@ -57,7 +57,7 @@ void init_kernel() {
 
 //addq
 void addq(TASK_ID_TYPE pointer, int taskId){
-	TASK_ID_TYPE next_task = task_tab[pointer].next;
+	TASK_ID_TYPE next_task = task_tab[pointer].next; //キューの先頭から次のタスクを取得
 	while(1){
 		if(next_task == NULLTASKID){
 			task_tab[pointer].next = taskId;//キューの最後尾にタスクを追加	
@@ -68,9 +68,9 @@ void addq(TASK_ID_TYPE pointer, int taskId){
 	}
 }
 
-TASK_ID_TYPE removeq(TASK_ID_TYPE &pointer){
-	TASK_ID_TYPE retval = pointer;// あってるかわからん
-	pointer = task_tab[pointer].next;
+TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
+	TASK_ID_TYPE retval = *pointer;// あってるかわからん
+	*pointer = task_tab[pointer].next;
 	return retval;	
 }
 
