@@ -50,3 +50,22 @@ void init_kernel() {
 	}
 }
 
+int* init_stack(TASK_ID_TYPE id){
+	int *ssp;
+	// タスクのエントリポイントをtask_addrに設定（例）[TODO]この例を消す
+ 	task_tab[id].task_addr = (void (*)(void))0x12345678; 
+  	// スタックポインタsspをスタックの末尾に設定
+  	ssp = (int *)(&stacks[id-1].sstack);
+ 	// スタックにタスクのアドレスをプッシュ
+  	*(--ssp) = (int)task_tab[id].task_addr;
+	//initial SRを0x0000に設定
+	ssp = (int *)((char *)ssp - 2); // ssp のアドレスを 2 バイト減らす
+	*(ssp) = (unsigned short int) 0;
+	//sspを15x4byte for register分減らす
+	ssp=ssp-15;				
+	//ユーザースタックへのポインタを追加
+	*(--ssp) = (int)(&stacks[id -1].ustack);
+	return ssp;
+	
+
+}
