@@ -77,15 +77,27 @@ TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
 
 //semaphore
 // タスクを休眠状態にする関数
+void sleep(int ch){
+	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
+	sched();
+	swtch();
+}
+
+// タスクを実行可能状態にする関数
+void wakeup(int ch){
+	int task = removeq(&semaphore[ch].task_list);  			// task = セマフォから取り出したタスク
+	if(task != NULLTASKID){
+		addq(ready, task);  // readyにtaskを追加
+	}
+}
+
+
 void sleep(TASK_ID_TYPE ch){
 	task_tab[curr_task].next = semaphore[ch].task_list;  // セマフォの先頭に実行中タスクを追加
 	semaphore[ch].task_list = curr_task;  		     // セマフォの先頭を更新
 	sched();
 	swtch();
 }
-
-
-// タスクを実行可能状態にする関数
 void wakeup(TASK_ID_TYPE ch){
 	int task = semaphore[ch].task_list;  			// task = 実行可能にしたいタスク
 	if(task != NULLTASKID){
@@ -94,6 +106,11 @@ void wakeup(TASK_ID_TYPE ch){
 		ready = task;  					// readyの更新
 	}
 }
+
+
+
+
+
 
 void p_body(TASK_ID_TYPE semaphoreId){
 	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
