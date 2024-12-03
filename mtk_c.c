@@ -55,6 +55,25 @@ void init_kernel() {
 	}
 }
 
+//addq
+void addq(TASK_ID_TYPE pointer, int taskId){
+	TASK_ID_TYPE next_task = task_tab[pointer].next;
+	while(1){
+		if(next_task == NULLTASKID){
+			task_tab[pointer].next = taskId;//キューの最後尾にタスクを追加	
+			break;
+		}else{
+			next_task = task_tab[next_task].next;
+		}
+	}
+}
+
+TASK_ID_TYPE removeq(TASK_ID_TYPE &pointer){
+	TASK_ID_TYPE retval = pointer;// あってるかわからん
+	pointer = task_tab[pointer].next;
+	return retval;	
+}
+
 
 //semaphore
 // タスクを休眠状態にする関数
@@ -90,4 +109,4 @@ void v_body(TASK_ID_TYPE semaphoreId){
 		wakeup(semaphoreId);
 	}
 }
-
+PE
