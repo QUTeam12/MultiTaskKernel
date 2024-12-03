@@ -22,7 +22,7 @@ first_task:
 	mulu.l	#20, %d0	| TCBの1エントリサイズ(バイト数)を掛けて目的のTCBの先頭からのオフセット計算	
 	add.l	#4, %d0		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
 	add.l	%d0, %a0	| curr_taskが指すTCBのアドレス計算
-	move.l	%a0, %sp	| TCBに記録されるSSPの回復	
+	move.l	(%a0), %sp	| TCBに記録されるSSPの回復	
 	move.l	(%sp)+, %a7	| スタックからUSPを取り出し
 	movem.l	(%sp)+, %d0-%d7/%a0-%a6	| SSPに積まれる残り15本のレジスタの回復
 	rte			| SR, PCを回復してユーザタスク開始
