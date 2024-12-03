@@ -34,6 +34,7 @@ mulu_twenty: | TCBの1エントリサイズ(バイト数)を掛けて目的のTC
         beq     first_task_step2
         add.l   %d1, %d1
         addi.l  #1, %d2
+	bra	mulu_twenty
 
 first_task_step2:
         add.l   #4, %d1         | TCBの先頭から4バイト目にSSPが格納されているため4を加算
