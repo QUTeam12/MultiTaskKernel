@@ -92,26 +92,6 @@ void wakeup(int ch){
 }
 
 
-void sleep(TASK_ID_TYPE ch){
-	task_tab[curr_task].next = semaphore[ch].task_list;  // セマフォの先頭に実行中タスクを追加
-	semaphore[ch].task_list = curr_task;  		     // セマフォの先頭を更新
-	sched();
-	swtch();
-}
-void wakeup(TASK_ID_TYPE ch){
-	int task = semaphore[ch].task_list;  			// task = 実行可能にしたいタスク
-	if(task != NULLTASKID){
-		semaphore[ch].task_list = task_tab[task].next;  // セマフォの先頭を更新
-		task_tab[task].next = ready;  			// readyの先頭にtaskを連結
-		ready = task;  					// readyの更新
-	}
-}
-
-
-
-
-
-
 void p_body(TASK_ID_TYPE semaphoreId){
 	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
 	if(semaphore[semaphoreId].count < 0){
