@@ -55,26 +55,42 @@ void init_kernel() {
 	}
 }
 
+//addq
+void addq(TASK_ID_TYPE pointer, int taskId){
+	TASK_ID_TYPE next_task = task_tab[pointer].next; //キューの先頭から次のタスクを取得
+	while(1){
+		if(next_task == NULLTASKID){
+			task_tab[pointer].next = taskId;//キューの最後尾にタスクを追加	
+			break;
+		}else{
+			next_task = task_tab[next_task].next;
+		}
+	}
+}
+
+TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
+	TASK_ID_TYPE retval = *pointer;// あってるかわからん
+	*pointer = task_tab[pointer].next;
+	return retval;	
+}
+
 
 //semaphore
 // タスクを休眠状態にする関数
-void sleep(TASK_ID_TYPE ch){
-	task_tab[curr_task].next = semaphore[ch].task_list;  // セマフォの先頭に実行中タスクを追加
-	semaphore[ch].task_list = curr_task;  		     // セマフォの先頭を更新
+void sleep(int ch){
+	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
 	sched();
 	swtch();
 }
 
-
 // タスクを実行可能状態にする関数
-void wakeup(TASK_ID_TYPE ch){
-	int task = semaphore[ch].task_list;  			// task = 実行可能にしたいタスク
+void wakeup(int ch){
+	int task = removeq(&semaphore[ch].task_list);  			// task = セマフォから取り出したタスク
 	if(task != NULLTASKID){
-		semaphore[ch].task_list = task_tab[task].next;  // セマフォの先頭を更新
-		task_tab[task].next = ready;  			// readyの先頭にtaskを連結
-		ready = task;  					// readyの更新
+		addq(ready, task);  // readyにtaskを追加
 	}
 }
+
 
 void p_body(TASK_ID_TYPE semaphoreId){
 	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
@@ -90,4 +106,4 @@ void v_body(TASK_ID_TYPE semaphoreId){
 		wakeup(semaphoreId);
 	}
 }
-
+PE
