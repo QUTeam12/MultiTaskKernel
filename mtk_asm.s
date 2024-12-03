@@ -1,10 +1,32 @@
+.global first_task
 .global P
 .global V
 .global pv_handler
+
+.extern curr_task
+.extern	task_tab
 .extern p_body
 .extern v_body
+
 .section .text
 .even
+
+********************
+** first_task: カーネル使用スタックをcurr_taskのタスクに切り替えマルチタスク処理を開始するサブルーチン
+** 起動時点でスーパーバイザモードである必要がある
+*********************
+first_task: 
+	movem.l	%a0, -(%sp)	| 使用レジスタの退避
+	lea.l	task_tab, %a0	| TCB配列の先頭アドレス
+	move.l	curr_task, %d0	| 現在のタスクID
+	mulu.l	#20, %d0	| TCBの1エントリサイズ(バイト数)を掛けて目的のTCBの先頭からのオフセット計算	
+	add.l	#4, %d0		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
+	add.l	%d0, %a0	| curr_taskが指すTCBのアドレス計算
+	move.l	%a0, %sp	| TCBに記録されるSSPの回復	
+	move.l	(%sp)+, %a7	| スタックからUSPを取り出し
+	movem.l	(%sp)+, %d0-%d7/%a0-%a6	| SSPに積まれる残り15本のレジスタの回復
+	rte			| SR, PCを回復してユーザタスク開始
+
 ********************
 **Pシステムコールの入口サブルーチン
 **入力：引数（セマフォID） 
