@@ -57,6 +57,25 @@ void init_kernel() {
 	}
 }
 
+void* init_stack(TASK_ID_TYPE id) {
+	int *ssp;
+	// タスクのエントリポイントをtask_addrに設定
+	task_tab[id].task_addr = (void (*)(void))0x12345678; // TODO: 0x12345678は例なので後で消す
+  	// スタックポインタsspをスタックの末尾に設定
+  	ssp = (int *)(&stacks[id-1].sstack); 
+	ssp += NUMTASK; // TODO: NUMTASKの加算あってる？
+ 	// スタックにタスクのアドレスをプッシュ
+  	*(--ssp) = (int)task_tab[id].task_addr;
+	//initial SRを0x0000に設定
+	ssp = (int *)((char *)ssp - 2); // ssp のアドレスを 2 バイト減らす
+	*(ssp) = (unsigned short int)0;
+	//sspを15x4byte for register分減らす
+	ssp -= 15;	
+	//ユーザースタックへのポインタを追加
+	*(--ssp) = (int)(&stacks[id -1].ustack);
+	return ssp;
+}
+
 void set_task(void (*user_task_func)()) {
 	for(int i=1; i <= NUMTASK; i++){
 		if (task_tab[i].task_addr == NULL) { 
@@ -71,15 +90,9 @@ void set_task(void (*user_task_func)()) {
 	}
 }
 
-void* init_stack(TASK_ID_TYPE id) {
-    void *ssp;
-    return ssp;
-}
-
 void begin_sch() {
 	// 最初のタスクとタイマを設定してタスク起動
 	curr_task = removeq(); // TODO: 引数わかんない
 	init_timer();
 	first_task();
 }
-
