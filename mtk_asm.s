@@ -107,7 +107,7 @@ swtch:
 	mulu.w	#10, %d1
 	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため2を加算
 	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
-	move.l	%d0, %d3	|上までで計算したTCBのSSPの格納先アドレス
+	move.l	%d0, %a0	|上までで計算したTCBのSSPの格納先アドレス
 	
         move.l  stacks, %d0   	| stacks配列の先頭アドレス
         move.l  curr_task, %d1  | 現在のタスクID
@@ -118,7 +118,7 @@ swtch:
 	
         add.l   #half_STKSIZE, %d1         | stacksの先頭からSTKSIZE Byte目にSSPが格納されているためSTKSIZE/2を加算
         add.l   %d1, %d0        | curr_taskのstacksのSSPのアドレスをd0に保存
-	move.l	%d0,%d3		|TCBのSSPアドレスにSSPのアドレスを保存	
+	move.l	%d0,(%a0)		|TCBのSSPアドレスにSSPのアドレスを保存	
 	/*SSPの保存終わり*/
 	
 	move.l next_task #curr_task	|curr_taskにnext_taskをいれた
