@@ -16,19 +16,9 @@
 ** 起動時点でスーパーバイザモードである必要がある
 *********************
 first_task: 
-	movem.l	%a0, -(%sp)	| 使用レジスタの退避
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
-	move.l	#0, %d2
-	bra	mulu_twenty
-
-mulu_twenty: | TCBの1エントリサイズ(バイト数)を掛けて目的のTCBの先頭からのオフセット計算
-	cmp.l	#20, %d2
-	beq	first_task_step2
-	add.l	%d1, %d1
-	addi.l	#1, %d2
-
-first_task_step2:
+	mulu.w	#14, %d1
 	add.l	#4, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
 	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
 	move.l	(%d0), %sp	| TCBに記録されるSSPの回復	
