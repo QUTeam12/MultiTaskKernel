@@ -53,7 +53,7 @@ void init_kernel() {
 	// セマフォのフィールド群の初期化
 	for(int i=0; i< NUMSEMAPHORE;i++){
 		semaphore[i].count = 1; // TODO: 初期のリソースアクセス状況は1だが正直わからん
-		semaphore[i].nst = UNDEFINED;// TODO: nstの意味がそもそもわからない
+		semaphore[i].nst = UNDEFINED; // TODO: nstの意味がそもそもわからない
 		semaphore[i].task_list 	= NULLTASKID;
 	}
 }
@@ -64,7 +64,7 @@ void* init_stack(TASK_ID_TYPE id) {
 	task_tab[id].task_addr = (void (*)(void))0x12345678; // TODO: 0x12345678は例なので後で消す
   	// スタックポインタsspをスタックの末尾に設定
   	ssp = (int *)(&stacks[id-1].sstack); 
-	ssp += NUMTASK; // TODO: NUMTASKの加算あってる？
+	ssp += STKSIZE; // TODO: STKSIZEの加算あってる？
  	// スタックにタスクのアドレスをプッシュ
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
@@ -73,7 +73,7 @@ void* init_stack(TASK_ID_TYPE id) {
 	//sspを15x4byte for register分減らす
 	ssp -= 15;	
 	//ユーザースタックへのポインタを追加
-	*(--ssp) = (int)(&stacks[id -1].ustack);
+	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
 	return ssp;
 }
 
@@ -96,30 +96,41 @@ void begin_sch() {
 	curr_task = removeq(); // TODO: 引数わかんない
 	init_timer();
 	first_task();
+void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
+	TASK_ID_TYPE next_task = task_tab[pointer].next; // キューの先頭から次のタスクを取得
+	while(1){
+		if(next_task == NULLTASKID){
+			task_tab[pointer].next = taskId; // キューの最後尾にタスクを追加	
+			break;
+		}else{
+			next_task = task_tab[next_task].next;
+		}
+	}
 }
 
-//semaphore
+TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
+	TASK_ID_TYPE retval = *pointer;
+	*pointer = task_tab[pointer].next;
+	return retval;	
+}
+
 // タスクを休眠状態にする関数
-void sleep(TASK_ID_TYPE ch){
-	task_tab[curr_task].next = semaphore[ch].task_list;  // セマフォの先頭に実行中タスクを追加
-	semaphore[ch].task_list = curr_task;  		     // セマフォの先頭を更新
+void sleep(int ch){
+	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
 	sched();
 	swtch();
 }
 
-
 // タスクを実行可能状態にする関数
-void wakeup(TASK_ID_TYPE ch){
-	int task = semaphore[ch].task_list;  			// task = 実行可能にしたいタスク
+void wakeup(int ch){
+	int task = removeq(&semaphore[ch].task_list); // task = セマフォから取り出したタスク
 	if(task != NULLTASKID){
-		semaphore[ch].task_list = task_tab[task].next;  // セマフォの先頭を更新
-		task_tab[task].next = ready;  			// readyの先頭にtaskを連結
-		ready = task;  					// readyの更新
+		addq(ready, task);  // readyにtaskを追加
 	}
 }
 
 void p_body(TASK_ID_TYPE semaphoreId){
-	semaphore[semaphoreId].count -= 1; /* セマフォの値を減らす */
+	semaphore[semaphoreId].count -= 1; // セマフォの値を減らす
 	if(semaphore[semaphoreId].count < 0){
 		// タスクを休眠状態に
 		sleep(semaphoreId);
