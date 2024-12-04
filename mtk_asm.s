@@ -99,13 +99,13 @@ init_timer:
 swtch:
 	move.w 	%sr,-(%sp)	/*SRの値をスタックに積んでRTEで復帰できるようにする*/
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
-	move.w	%a7,-(%sp)	/*USPの値をスタックに積む*/
+	move.l	%a7,-(%sp)	/*USPの値をスタックに積む*/
 	movem.l %a0, -(%sp)     | 使用レジスタの退避[TODO]レジスタ追加
 	/*ここからしばらくSSPの保存*/
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
-	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
+	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため2を加算
 	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
 	move.l	%d0, %d3	|上までで計算したTCBのSSPの格納先アドレス
 	
@@ -126,10 +126,10 @@ swtch:
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
-	add.l	#4, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
+	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため2を加算
 	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
 	move.l	(%d0), %sp	| TCBに記録されるSSPの回復	
 	
-	move.w	(%sp)+, %a7	| USPの値を回復
+	move.l	(%sp)+, %a7	|USPの値を回復
 	movem.l (%sp)+, %d0-%d7/%a0-%a6
 	rte
