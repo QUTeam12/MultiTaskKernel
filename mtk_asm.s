@@ -121,7 +121,7 @@ swtch:
 	move.l	%d0,(%a0)		|TCBのSSPアドレスにSSPのアドレスを保存	
 	/*SSPの保存終わり*/
 	
-	move.l next_task #curr_task	|curr_taskにnext_taskをいれた
+	move.l next_task curr_task	|curr_taskにnext_taskをいれた
 
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
