@@ -52,3 +52,4 @@ void sleep(int ch);
 void wakeup(int ch);
 void p_body(TASK_ID_TYPE semaphoreId);
 void v_body(TASK_ID_TYPE semaphoreId);
+void sched();
