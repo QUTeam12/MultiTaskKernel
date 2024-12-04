@@ -123,7 +123,7 @@ swtch:
 	
 	move.l next_task curr_task	|curr_taskにnext_taskをいれた
 //TODO: moveに%a0が使えるか不明
-	move.l	%0, %sp	| TCBに記録されるSSPの回復	
+	move.l	%a0, %sp	| TCBに記録されるSSPの回復	
 	
 	move.l	(%sp)+, %a7	|USPの値を回復
 	movem.l (%sp)+, %d0-%d7/%a0-%a6
