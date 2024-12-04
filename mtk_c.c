@@ -63,15 +63,15 @@ void* init_stack(TASK_ID_TYPE id) {
 	// タスクのエントリポイントをtask_addrに設定
 	task_tab[id].task_addr = (void (*)(void))0x12345678; // TODO: 0x12345678は例なので後で消す
   	// スタックポインタsspをスタックの末尾に設定
-  	ssp = (int *)(&stacks[id-1].sstack); 
-	ssp += STKSIZE; // TODO: STKSIZEの加算あってる？
+  	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
  	// スタックにタスクのアドレスをプッシュ
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
-	ssp = (int *)((char *)ssp - 2); // ssp のアドレスを 2 バイト減らす
+	// TODO: アドレス計算再チェック
+	ssp = (int *)(ssp - 1); // ssp のアドレスを 2 バイト減らす
 	*(ssp) = (unsigned short int)0;
 	//sspを15x4byte for register分減らす
-	ssp -= 15;	
+	ssp -= 30;	
 	//ユーザースタックへのポインタを追加
 	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
 	return ssp;
