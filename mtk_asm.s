@@ -71,7 +71,7 @@ pv_handler_end:
 *****************************
 **hard_clock
 *****************************
- hard_clock:
+hard_clock:
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.l  curr_task, -(%sp)
 	move.l  ready, -(%sp)
