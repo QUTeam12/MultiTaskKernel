@@ -18,8 +18,8 @@
 first_task: 
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
-	mulu.w	#14, %d1
-	add.l	#4, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
+	mulu.w	#10, %d1
+	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
 	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
 	move.l	(%d0), %sp	| TCBに記録されるSSPの回復	
 	move.l	(%sp)+, %a7	| スタックからUSPを取り出し
