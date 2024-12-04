@@ -122,13 +122,8 @@ swtch:
 	/*SSPの保存終わり*/
 	
 	move.l next_task curr_task	|curr_taskにnext_taskをいれた
-
-	move.l	task_tab, %d0	| TCB配列の先頭アドレス
-	move.l	curr_task, %d1	| 現在のタスクID
-	mulu.w	#10, %d1
-	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため2を加算
-	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
-	move.l	(%d0), %sp	| TCBに記録されるSSPの回復	
+//TODO: moveに%a0が使えるか不明
+	move.l	%0, %sp	| TCBに記録されるSSPの回復	
 	
 	move.l	(%sp)+, %a7	|USPの値を回復
 	movem.l (%sp)+, %d0-%d7/%a0-%a6
