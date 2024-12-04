@@ -12,6 +12,7 @@
 .extern addq
 .extern sched
 .extern stacks
+.extern next_task
 
 .section .text
 .even
@@ -96,10 +97,11 @@ init_timer:
 **swtch
 ******************************
 swtch:
-	move.w 	%sr,-(%sp)	/*SRの値をスタックに積む*/
-	movem.l %d0-%d7/%a0-%a6 -(%sp)
+	move.w 	%sr,-(%sp)	/*SRの値をスタックに積んでRTEで復帰できるようにする*/
+	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.w	%a7,-(%sp)	/*USPの値をスタックに積む*/
 	movem.l %a0, -(%sp)     | 使用レジスタの退避[TODO]レジスタ追加
+	/*ここからしばらくSSPの保存*/
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
@@ -110,11 +112,24 @@ swtch:
         move.l  stacks, %d0   	| stacks配列の先頭アドレス
         move.l  curr_task, %d1  | 現在のタスクID
 	sub.l	#1,%d1		| stacks配列では0スタートだが、taskIDは1スタートなので、変換
+
 	/*ここからしばらくワード型で計算taskIDは多くても10とかだし、STKSIZEは8000なので、二倍して16000これを10倍してもワード型をあふれることはないだろう*/
 	mulu.w	#STKSIZE, %d1	|ここまでの計算で(taskID -1) * STKSIZE(char(1Byte)*STKSIZE) / 2(2Byteで1アドレス) * 2(構造体内の配列の個数)をした
 	
         add.l   #half_STKSIZE, %d1         | stacksの先頭からSTKSIZE Byte目にSSPが格納されているためSTKSIZE/2を加算
         add.l   %d1, %d0        | curr_taskのstacksのSSPのアドレスをd0に保存
+	move.l	%d0,%d3		|TCBのSSPアドレスにSSPのアドレスを保存	
+	/*SSPの保存終わり*/
 	
-	|TODO:stacksの番地計算とTCBにSSPを記録することとMULUの変更の適応
-	move.l	(%a0), %sp	| TCBにSSPを記録		
+	move.l next_task #curr_task	|curr_taskにnext_taskをいれた
+
+	move.l	task_tab, %d0	| TCB配列の先頭アドレス
+	move.l	curr_task, %d1	| 現在のタスクID
+	mulu.w	#10, %d1
+	add.l	#4, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
+	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
+	move.l	(%d0), %sp	| TCBに記録されるSSPの回復	
+	
+	move.w	(%sp)+, %a7	| USPの値を回復
+	movem.l (%sp)+, %d0-%d7/%a0-%a6
+	rte
