@@ -30,7 +30,7 @@ first_task:
 	mulu.w	#10, %d1
 	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
 	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
-	move.l	(%d0), %sp	| TCBに記録されるSSPの回復	
+	move.l	%d0, %sp	| TCBに記録されるSSPの回復	
 	move.l	(%sp)+, %a7	| スタックからUSPを取り出し
 	movem.l	(%sp)+, %d0-%d7/%a0-%a6	| SSPに積まれる残り15本のレジスタの回復
 	rte			| SR, PCを回復してユーザタスク開始
@@ -147,7 +147,7 @@ swtch:
 	move.l	%d0,(%a0)		|TCBのSSPアドレスにSSPのアドレスを保存	
 	/*SSPの保存終わり*/
 	
-	move.l next_task curr_task	|curr_taskにnext_taskをいれた
+	move.l next_task, curr_task	|curr_taskにnext_taskをいれた
 //TODO: moveに%a0が使えるか不明
 	move.l	%a0, %sp	| TCBに記録されるSSPの回復	
 	
