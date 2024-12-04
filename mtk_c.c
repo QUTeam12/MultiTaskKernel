@@ -29,6 +29,11 @@ typedef struct {
 
 STACK_TYPE	stacks[NUMTASK]; // stacks[0]からID=1のタスクを割り振る
 
+TASK_ID_TYPE curr_task;
+TASK_ID_TYPE new_task;
+TASK_ID_TYPE next_task;
+TASK_ID_TYPE ready;
+
 void init_kernel() {
 	// TCB配列の初期化
 	for(int i=1; i <= NUMTASK; i++){
@@ -45,8 +50,55 @@ void init_kernel() {
 	// セマフォの値の初期化
 	for(int i=0; i< NUMSEMAPHORE;i++){
 		semaphore[i].count = 1; // TODO: 初期のリソースアクセス状況は1だが正直わからん
-		semaphore[i].nst = UNDEFINED;// TODO: nstの意味がそもそもわからない
+		semaphore[i].nst = UNDEFINED; // TODO: nstの意味がそもそもわからない
 		semaphore[i].task_list 	= NULLTASKID;
 	}
 }
 
+void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
+	TASK_ID_TYPE next_task = task_tab[pointer].next; // キューの先頭から次のタスクを取得
+	while(1){
+		if(next_task == NULLTASKID){
+			task_tab[pointer].next = taskId; // キューの最後尾にタスクを追加	
+			break;
+		}else{
+			next_task = task_tab[next_task].next;
+		}
+	}
+}
+
+TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
+	TASK_ID_TYPE retval = *pointer;
+	*pointer = task_tab[pointer].next;
+	return retval;	
+}
+
+// タスクを休眠状態にする関数
+void sleep(int ch){
+	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
+	sched();
+	swtch();
+}
+
+// タスクを実行可能状態にする関数
+void wakeup(int ch){
+	int task = removeq(&semaphore[ch].task_list); // task = セマフォから取り出したタスク
+	if(task != NULLTASKID){
+		addq(ready, task);  // readyにtaskを追加
+	}
+}
+
+void p_body(TASK_ID_TYPE semaphoreId){
+	semaphore[semaphoreId].count -= 1; // セマフォの値を減らす
+	if(semaphore[semaphoreId].count < 0){
+		// タスクを休眠状態に
+		sleep(semaphoreId);
+	}
+}
+
+void v_body(TASK_ID_TYPE semaphoreId){
+	semaphore[semaphoreId].count += 1;
+	if(semaphore[semaphoreId].count <= 0){
+		wakeup(semaphoreId);
+	}
+}
