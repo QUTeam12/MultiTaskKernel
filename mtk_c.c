@@ -161,3 +161,15 @@ void v_body(TASK_ID_TYPE semaphoreId){
 	}
 }
 
+/************************
+** @brief ready キューの先頭のタスク ID を取り出し，next task にセットする
+** @author 宮坂
+*************************/
+void sched(){
+	TASK_ID_TYPE a = removeq(&ready);
+	next_task = a;
+	
+	if(next_task == NULLTASKID){
+		sched();
+	}
+}
