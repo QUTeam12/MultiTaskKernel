@@ -93,9 +93,11 @@ void set_task(void (*user_task_func)()) {
 
 void begin_sch() {
 	// 最初のタスクとタイマを設定してタスク起動
-	curr_task = removeq(); // TODO: 引数わかんない
+	curr_task = removeq(&ready);
 	init_timer();
 	first_task();
+}
+
 void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
 	TASK_ID_TYPE next_task = task_tab[pointer].next; // キューの先頭から次のタスクを取得
 	while(1){
