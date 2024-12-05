@@ -22,13 +22,24 @@
 .section .text
 .even
 
+*********************
+** debug
+******************
+| TODO: debug用print関数
+.extern print
+debug:
+	movem.l	%d0, -(%sp)
+	jsr	print
+	movem.l	(%sp)+, %d0
+	rts
+
 ********************
 ** first_task: カーネル使用スタックをcurr_taskのタスクに切り替えマルチタスク処理を開始するサブルーチン
 ** 起動時点でスーパーバイザモードである必要がある
 ** 製作者: 執行
 *********************
 first_task:
-	move.w #0x2000, %SR	| スーパーバイザモード(割り込み許可)
+	move.w #0x2700, %SR	| スーパーバイザモード(割り込み許可)
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
@@ -38,7 +49,6 @@ first_task:
 	move.l	(%sp)+, %a0	| %uspの制約によりアドレスレジスタからmoveする必要がある
 	move.l	%a0, %usp	| スタックからUSPを取り出し
 	movem.l	(%sp)+, %d0-%d7/%a0-%a6	| SSPに積まれる残り15本のレジスタの回復
-	move.b	#'e', LED4 || TODO: debug
 	rte			| SR, PCを回復してユーザタスク開始
 
 ********************
@@ -101,7 +111,6 @@ pv_handler_end:
 ** 製作者: 宮坂
 *****************************
 hard_clock:
-	move.b	#'h', LED3 | TODO: debug
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.l  curr_task, -(%sp)
 	move.l  ready, -(%sp)
@@ -119,7 +128,7 @@ hard_clock:
 init_timer:
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
 	|| move.w  #0x64, %d1 /* Linux周期。10ms */
-	move.w  #0x2710, %d1 /* 動作確認用。1sec。 */
+	move.w  #0x2710, %d1 /* TODO: 動作確認したので割り込みは一旦おやすみ(10sec)。 */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts

@@ -16,6 +16,11 @@ TASK_ID_TYPE new_task;	// 現在登録作業中のタスクのID
 TASK_ID_TYPE next_task;	// 次に実行するタスクのID
 TASK_ID_TYPE ready;	// 実行待ちタスクのキューの先頭タスクのID
 
+// TODO: debug
+void print(int a) {
+	printf("%d\r\n", a);
+}
+
 /***********************************
  * @brief カーネルの初期化
  * @author 小紫
