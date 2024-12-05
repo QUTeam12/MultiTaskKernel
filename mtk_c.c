@@ -1,16 +1,11 @@
+#define MTK
 #include "mtk_c.h"
+#include <stdio.h>
+#include <stddef.h>
 
-extern void first_task();
-extern void init_timer();
-extern void pv_handler();
-SEMAPHORE_TYPE	semaphore[NUMSEMAPHORE];
-TCB_TYPE	task_tab[NUMTASK+1];	// task_tab[1]からID=1のタスクを割り振る
-STACK_TYPE	stacks[NUMTASK];	// stacks[0]からID=1のタスクを割り振る
-
-TASK_ID_TYPE curr_task;	// 現在実行中のタスクのID
-TASK_ID_TYPE new_task;	// 現在登録作業中のタスクのID
-TASK_ID_TYPE next_task;	// 次に実行するタスクのID
-TASK_ID_TYPE ready;	// 実行待ちタスクのキューの先頭タスクのID
+void printdebug(int a){
+	printf("%d\n",a);
+}
 
 /***********************************
  * @brief カーネルの初期化
@@ -28,13 +23,15 @@ void init_kernel() {
 	// readyキューの初期化
 	ready = NULLTASKID;
 	// PVシステムコールの割り込み処理ルーチン(pv_handler)をTRAP1の割り込みベクタに登録
-	*(void(**) ())0x084 = pv_handler; // TODO: trap1のアドレスがあってるかわからない
+	*(void(**) ())0x084 =pv_handler; // TODO: trap1のアドレスがあってるかわからない
 	// セマフォのフィールド群の初期化
 	for(int i=0; i< NUMSEMAPHORE;i++){
 		semaphore[i].count = 1; // TODO: 初期のリソースアクセス状況は1だが正直わからん
 		semaphore[i].nst = UNDEFINED;
 		semaphore[i].task_list 	= NULLTASKID;
 	}
+	//DEBUG
+	printf("initTask\n");
 }
 
 /***********************************
@@ -58,6 +55,8 @@ void* init_stack(TASK_ID_TYPE id) {
 	ssp -= 30;	
 	//ユーザースタックへのポインタを追加
 	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
+	//DEBUG
+	printf("init_stack\n");
 	return ssp;
 }
 
@@ -75,6 +74,8 @@ void set_task(void (*user_task_func)()) {
 			task_tab[i].status = TCB_ACTIVE;
 			task_tab[i].stack_ptr = init_stack(new_task);
 			ready = new_task;
+			//DEBUG
+			printf("set_task\n");
 			return;
 		}
 	}
@@ -87,7 +88,10 @@ void set_task(void (*user_task_func)()) {
 void begin_sch() {
 	curr_task = removeq(&ready);
 	init_timer();
+	printf("timer\n");
 	first_task();
+	//DEBUG
+	printf("begin_sch\n");
 }
 
 /***********************************
@@ -101,6 +105,8 @@ void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
 	while(1){
 		if(next_task == NULLTASKID){
 			task_tab[pointer].next = taskId; // キューの最後尾にタスクを追加	
+	//DEBUG
+	printf("addq\n");
 			break;
 		}else{
 			next_task = task_tab[next_task].next;
@@ -117,6 +123,8 @@ void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
 TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
 	TASK_ID_TYPE retval = *pointer;
 	*pointer = task_tab[*pointer].next;
+	//DEBUG
+	printf("removeq\n");
 	return retval;	
 }
 
@@ -129,6 +137,8 @@ void sleep(int ch){
 	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
 	sched();
 	swtch();
+	//DEBUG
+	printf("sleep\n");
 }
 
 /***********************************
@@ -141,6 +151,8 @@ void wakeup(int ch){
 	if(task != NULLTASKID){
 		addq(ready, task);  // readyにtaskを追加
 	}
+	//DEBUG
+	printf("wakeup\n");
 }
 
 /***********************************
@@ -154,6 +166,8 @@ void p_body(TASK_ID_TYPE semaphoreId){
 		// タスクを休眠状態に
 		sleep(semaphoreId);
 	}
+	//DEBUG
+	printf("p_body\n");
 }
 
 /***********************************
@@ -166,6 +180,8 @@ void v_body(TASK_ID_TYPE semaphoreId){
 	if(semaphore[semaphoreId].count <= 0){
 		wakeup(semaphoreId);
 	}
+	//DEBUG
+	printf("v_body\n");
 }
 
 /************************
@@ -179,4 +195,6 @@ void sched(){
 	if(next_task == NULLTASKID){
 		sched();
 	}
+	//DEBUG
+	printf("sched\n");
 }

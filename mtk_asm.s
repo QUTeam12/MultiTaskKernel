@@ -15,16 +15,28 @@
 .extern sched
 .extern stacks
 .extern next_task
+.extern printdebug
 
 .section .text
 .even
 
+
+*********************
+** debug
+******************
+debug:
+	movem.l %d0, -(%sp)
+	jsr printdebug
+	movem.l (%sp)+, %d0
+	rts
 ********************
 ** first_task: カーネル使用スタックをcurr_taskのタスクに切り替えマルチタスク処理を開始するサブルーチン
 ** 起動時点でスーパーバイザモードである必要がある
 ** 製作者: 執行
 *********************
 first_task: 
+	move.l #1, %d0
+	jsr debug
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
@@ -110,9 +122,10 @@ hard_clock:
 ** 製作者: 宮坂
 *****************************
 init_timer:
+	move.l #SYSCALL_NUM_RESET_TIMER,%D0
+	trap #0
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
-	move.w  #0x64, %d1 /* Linux周期。10ms */
-	** move.w  #0x2710, %d1 /* 動作確認用。1sec。 */
+	move.w  #100, %d1 /* Linux周期。10ms */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts

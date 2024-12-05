@@ -1,21 +1,23 @@
-#include <stdio.h>
+#define TEST2
 #include "mtk_c.h"
+#include <stdio.h>
 
 void task1() {
         while(1){
-                printf("task1");
+                printf("task1\n");
         }
 }
 
 void task2() {
         while(1){
-                printf("task2");
+                printf("task2\n");
         }
 }
 
 int main() {
-        init_kernel();
-        set_task(task1);
-        set_task(task2);
-        begin_sch();
+	init_kernel();
+	set_task(task1);
+	set_task(task2);
+	begin_sch();
+	return 0;
 }
