@@ -24,6 +24,7 @@
 
 *********************
 ** debug
+** 割り込み処理の途中では出力されないため注意
 ******************
 | TODO: debug用print関数
 .extern print
@@ -39,7 +40,7 @@ debug:
 ** 製作者: 執行
 *********************
 first_task:
-	move.w #0x2700, %SR	| スーパーバイザモード(割り込み許可)
+	move.w #0x2000, %SR	| スーパーバイザモード(割り込み許可)
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
@@ -126,6 +127,8 @@ hard_clock:
 ** 製作者: 宮坂
 *****************************
 init_timer:
+	move.l	#SYSCALL_NUM_RESET_TIMER, %D0
+	trap #0
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
 	|| move.w  #0x64, %d1 /* Linux周期。10ms */
 	move.w  #0x2710, %d1 /* TODO: 動作確認したので割り込みは一旦おやすみ(10sec)。 */
