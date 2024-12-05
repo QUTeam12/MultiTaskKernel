@@ -1,5 +1,6 @@
 #include "mtk_c.h"
 #include <stddef.h>
+#include <stdio.h>
 
 extern void first_task();
 extern void init_timer();
@@ -87,8 +88,13 @@ void set_task(void (*user_task_func)()) {
  **********************************/
 void begin_sch() {
 	curr_task = removeq(&ready);
+	printf("removeqおけ\r\n");
 	init_timer();
+	printf("init_timerおけ\r\n");
+//	*(char *)0x00d00039 = 'A'; // TODO: LED0 debug
 	first_task();
+	printf("first_taskおけ\r\n");
+//	*(char *)0x00d00039 = 'B'; // TODO: LED0 debug
 }
 
 /***********************************

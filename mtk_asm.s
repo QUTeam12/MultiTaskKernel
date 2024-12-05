@@ -1,20 +1,23 @@
-.global first_task
-.extern	task_tab
 .include "equdefs.inc"
+
 .global P
 .global V
+.global first_task
 .global pv_handler
 .global hard_clock
 .global init_timer
 .global swtch
+
+.extern curr_task
+.extern next_task
+.extern ready
+.extern	task_tab
+
+.extern addq
 .extern p_body
 .extern v_body
-.extern curr_task
-.extern ready
-.extern addq
 .extern sched
 .extern stacks
-.extern next_task
 
 .section .text
 .even
@@ -25,7 +28,7 @@
 ** 製作者: 執行
 *********************
 first_task:
-	move.w #0x2700,%SR	| スーパーバイザモードにする
+	move.w #0x2000, %SR	| スーパーバイザモード(割り込み許可)
 	move.l	task_tab, %d0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#10, %d1
@@ -98,6 +101,7 @@ pv_handler_end:
 ** 製作者: 宮坂
 *****************************
 hard_clock:
+	move.b	#'h', LED3 | TODO: debug
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.l  curr_task, -(%sp)
 	move.l  ready, -(%sp)
@@ -114,8 +118,8 @@ hard_clock:
 *****************************
 init_timer:
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
-	move.w  #0x64, %d1 /* Linux周期。10ms */
-	** move.w  #0x2710, %d1 /* 動作確認用。1sec。 */
+	|| move.w  #0x64, %d1 /* Linux周期。10ms */
+	move.w  #0x2710, %d1 /* 動作確認用。1sec。 */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts
