@@ -99,7 +99,7 @@ hard_clock:
 	move.l  curr_task, -(%sp)
 	move.l  ready, -(%sp)
 	jsr     addq
- 	addi.l  #8, %sp
+ 	add.l  #8, %sp
 	jsr     sched
 	jsr     swtch
 	movem.l (%sp)+, %d0-%d7/%a0-%a6
@@ -148,7 +148,7 @@ swtch:
 	/*SSPの保存終わり*/
 	
 	move.l next_task, curr_task	|curr_taskにnext_taskをいれた
-//TODO: moveに%a0が使えるか不明
+**TODO: moveに%a0が使えるか不明
 	move.l	%a0, %sp	| TCBに記録されるSSPの回復	
 	
 	move.l	(%sp)+, %a7	|USPの値を回復

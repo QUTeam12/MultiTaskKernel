@@ -17,7 +17,7 @@ typedef struct {
 	TASK_ID_TYPE task_list;	// TODO: セマフォの一番前のタスクID。実行中なのか待機中なのかは不明
 } SEMAPHORE_TYPE;
 
-SEMAPHORE_TYPE	semaphore[NUMSEMAPHORE];
+
 
 typedef struct {
 	void (*task_addr)();	// タスクの関数ポインタ
@@ -27,19 +27,14 @@ typedef struct {
 	TASK_ID_TYPE next;	// セマフォかreadyキューの次のタスクID。詳細はp33。
 } TCB_TYPE;
 
-TCB_TYPE	task_tab[NUMTASK+1];	// task_tab[1]からID=1のタスクを割り振る
+
 
 typedef struct {
 	char ustack[STKSIZE];	// ユーザスタック
 	char sstack[STKSIZE];	// スーパーバイザスタック
 } STACK_TYPE;
 
-STACK_TYPE	stacks[NUMTASK];	// stacks[0]からID=1のタスクを割り振る
 
-TASK_ID_TYPE curr_task;	// 現在実行中のタスクのID
-TASK_ID_TYPE new_task;	// 現在登録作業中のタスクのID
-TASK_ID_TYPE next_task;	// 次に実行するタスクのID
-TASK_ID_TYPE ready;	// 実行待ちタスクのキューの先頭タスクのID
 
 // 関数のプロトタイプ宣言
 void init_kernel();
