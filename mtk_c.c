@@ -41,14 +41,12 @@ void init_kernel() {
 }
 
 /***********************************
- * @brief ユーザタスクの用のスタック初期化
+ * @brief ユーザタスク用のスタック初期化
  * @param id: タスクID
  * @author 小紫
  **********************************/
 void* init_stack(TASK_ID_TYPE id) {
 	int *ssp;
-	// タスクのエントリポイントをtask_addrに設定
-	task_tab[id].task_addr = (void (*)(void))0x12345678; // TODO: 0x12345678は例なので後で消す
   	// スタックポインタsspをスタックの末尾に設定
   	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
  	// スタックにタスクのアドレスをプッシュ
