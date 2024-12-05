@@ -14,8 +14,13 @@ void task2() {
 }
 
 int main() {
+	printf("はじめ");
         init_kernel();
+	printf("init_kernelおけ");
         set_task(task1);
         set_task(task2);
-        begin_sch();
+	printf("set_taskおけ");
+        begin_sch(); // 実行すると標準出力が効かなくなる
+	printf("begin_schおけ");
+	return 0;
 }

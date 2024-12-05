@@ -4,6 +4,8 @@
 extern void first_task();
 extern void init_timer();
 extern void pv_handler();
+extern void swtch();
+
 SEMAPHORE_TYPE	semaphore[NUMSEMAPHORE];
 TCB_TYPE	task_tab[NUMTASK+1];	// task_tab[1]からID=1のタスクを割り振る
 STACK_TYPE	stacks[NUMTASK];	// stacks[0]からID=1のタスクを割り振る
