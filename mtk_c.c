@@ -51,21 +51,22 @@ void init_kernel() {
  * @param id: タスクID
  * @author 小紫
  **********************************/
-void* init_stack(TASK_ID_TYPE id) {
+void *init_stack(TASK_ID_TYPE id) {
 	int *ssp;
+	unsigned int *ssp2;
+
   	// スタックポインタsspをスタックの末尾に設定
-  	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
+  	ssp = &stacks[id-1].sstack[STKSIZE];
  	// スタックにタスクのアドレスをプッシュ
-  	*(--ssp) = (int)task_tab[id].task_addr;
+  	*(--ssp) = task_tab[id].task_addr;
 	//initial SRを0x0000に設定
-	// TODO: アドレス計算再チェック
-	ssp = (int *)(ssp - 1); // ssp のアドレスを 2 バイト減らす
-	*(ssp) = (unsigned short int)0;
-	//sspを15x4byte for register分減らす
-	ssp -= 30;	
+	ssp2 = &stacks[id-1].sstack[STKSIZE-5];
+	*(--ssp2) = 0x0000;
+	//sspを2byteと15x4byte for register分減らす
+	ssp -= 62;
 	//ユーザースタックへのポインタを追加
-	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
-	return ssp;
+	*(--ssp) = &stacks[id-1].ustack[STKSIZE];
+	return *ssp;
 }
 
 /***********************************

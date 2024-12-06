@@ -41,17 +41,17 @@ debug:
 ** 製作者: 執行
 *********************
 first_task:
-	move.w #0x2000, %SR	| スーパーバイザモード(割り込み許可)
-	move.l	task_tab, %d0	| TCB配列の先頭アドレス
-	move.l	curr_task, %d1	| 現在のタスクID
-	mulu.w	#10, %d1
-	add.l	#2, %d1		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
-	add.l	%d1, %d0	| curr_taskが指すTCBのアドレス計算
-	move.l	%d0, %sp	| TCBに記録されるSSPの回復	
-	move.l	(%sp)+, %a0	| %uspの制約によりアドレスレジスタからmoveする必要がある
-	move.l	%a0, %usp	| スタックからUSPを取り出し
+	move.w #0x2700, %SR	| スーパーバイザモード(割り込み許可)
+	move.l	task_tab, %a0	| TCB配列の先頭アドレス
+	move.l	curr_task, %d0	| 現在のタスクID
+	subi.l	#1, %d0		| タスクID=1の場合先頭番地はtask_tabから始まる必要がある
+	mulu.w	#20, %d0
+	add.l	#4, %d0		| TCBの先頭から4バイト目にSSPが格納されているため4を加算
+	add.l	%d0, %a0	| curr_taskが指すTCBのアドレス計算
+	move.l	(%a0), %sp	| TCBに記録されるSSPの回復	
+	move.l	(%sp)+, %a1	| %uspの制約によりアドレスレジスタからmoveする必要がある
+	move.l	%a1, %usp	| スタックからUSPを取り出し
 	movem.l	(%sp)+, %d0-%d7/%a0-%a6	| SSPに積まれる残り15本のレジスタの回復
-		
 	rte			| SR, PCを回復してユーザタスク開始
 
 ********************
