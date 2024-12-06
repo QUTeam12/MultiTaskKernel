@@ -59,7 +59,7 @@ void* init_stack(TASK_ID_TYPE id) {
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
 	// TODO: アドレス計算再チェック
-	ssp = (int *)(ssp - 2); // ssp のアドレスを 2 バイト減らす
+	ssp = (int *)(*ssp - 2); // ssp のアドレスを 2 バイト減らす
 	*(ssp) = (unsigned short int)0;
 	//sspを15x4byte for register分減らす
 	ssp -= 60;	
@@ -96,10 +96,8 @@ void begin_sch() {
 	printf("removeqおけ\r\n");
 	init_timer();
 	printf("init_timerおけ\r\n");
-//	*(char *)0x00d00039 = 'A'; // TODO: LED0 debug
 	first_task();
-	printf("first_taskおけ\r\n");
-//	*(char *)0x00d00039 = 'B'; // TODO: LED0 debug
+	printf("first_task後も実行されてしまっているエラー\r\n");
 }
 
 /***********************************
