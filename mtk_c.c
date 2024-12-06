@@ -53,19 +53,18 @@ void init_kernel() {
  **********************************/
 void* init_stack(TASK_ID_TYPE id) {
 	int *ssp;
-	unsigned short int *ssp2;
-
   	// スタックポインタsspをスタックの末尾に設定
-  	ssp = (int *)&stacks[id-1].sstack[STKSIZE];
+  	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
  	// スタックにタスクのアドレスをプッシュ
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
-	ssp2 = (int *)&stacks[id-1].sstack[STKSIZE-5];
-	*(--ssp2) = 0x0000;
-	//sspを2byteと15x4byte for register分減らす
-	ssp -= 62;
+	// TODO: アドレス計算再チェック
+	ssp = (int *)(ssp - 2); // ssp のアドレスを 2 バイト減らす
+	*(ssp) = (unsigned short int)0;
+	//sspを15x4byte for register分減らす
+	ssp -= 60;	
 	//ユーザースタックへのポインタを追加
-	*(--ssp) = (int)&stacks[id-1].ustack[STKSIZE];
+	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
 	return ssp;
 }
 
