@@ -68,7 +68,7 @@ void *init_stack(TASK_ID_TYPE id) {
 	ssp -= 15;	
 	//ユーザースタックへのポインタを追加
 	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
-	printf("task%dの元sspは%pでスタック入れた後はsspは%pになる",id,&stacks[id-1].sstack[STKSIZE],ssp);
+	printf("task%dの元sspは%pでスタック入れた後はsspは%pになる\r\n",id,&stacks[id-1].sstack[STKSIZE],ssp);
 	return ssp;
 }
 
@@ -85,7 +85,11 @@ void set_task(void (*user_task_func)()) {
 			task_tab[i].task_addr = user_task_func;
 			task_tab[i].status = TCB_ACTIVE;
 			task_tab[i].stack_ptr = init_stack(new_task);
-			ready = new_task;
+			if(ready == NULLTASKID){
+				ready = new_task;
+			}else{
+				addq(ready,new_task);
+			}
 			return;
 		}
 	}
@@ -101,6 +105,7 @@ void begin_sch() {
 	printf("removeqおけ\r\n");
 	init_timer();
 	printf("init_timerおけ\r\n");
+	printf("したに表示される２つの数字は１つ目は次のプログラムのsrの値,２つ目は次のプログラムのPCの値(10進数なので、16進数に直して計算すること)\r\n");
 //	*(char *)0x00d00039 = 'A'; // TODO: LED0 debug
 	first_task();
 	printf("first_taskおけ\r\n");
