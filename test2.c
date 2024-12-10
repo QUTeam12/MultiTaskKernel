@@ -19,6 +19,8 @@ int main() {
 	printf("init_kernelおけ\r\n");
         set_task(task1);
         set_task(task2);
+	printf("task1のaddr%p\r\n",&task1);
+	printf("task2のaddr%p\r\n",&task2);
 	printf("set_taskおけ\r\n");
         begin_sch();
 	printf("begin_schおけ\r\n");

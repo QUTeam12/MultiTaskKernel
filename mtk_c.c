@@ -51,20 +51,24 @@ void init_kernel() {
  * @param id: タスクID
  * @author 小紫
  **********************************/
-void* init_stack(TASK_ID_TYPE id) {
+void *init_stack(TASK_ID_TYPE id) {
 	int *ssp;
+	unsigned short int *ssp2;
   	// スタックポインタsspをスタックの末尾に設定
   	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
  	// スタックにタスクのアドレスをプッシュ
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
 	// TODO: アドレス計算再チェック
-	ssp = (int *)(ssp - 1); // ssp のアドレスを 2 バイト減らす
-	*(ssp) = (unsigned short int)0;
+	ssp2= (unsigned short int *)ssp;
+	*(--ssp2)=0x0000;
+	ssp= (int *)ssp2;
+	//*(ssp) = (unsigned short int)0;
 	//sspを15x4byte for register分減らす
-	ssp -= 30;	
+	ssp -= 15;	
 	//ユーザースタックへのポインタを追加
 	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
+	printf("task%dの元sspは%pでスタック入れた後はsspは%pになる",id,&stacks[id-1].sstack[STKSIZE],ssp);
 	return ssp;
 }
 
@@ -93,6 +97,7 @@ void set_task(void (*user_task_func)()) {
  **********************************/
 void begin_sch() {
 	curr_task = removeq(&ready);
+	printf("curr_taskのtask_addr%p\r\n",task_tab[curr_task].task_addr);
 	printf("removeqおけ\r\n");
 	init_timer();
 	printf("init_timerおけ\r\n");
