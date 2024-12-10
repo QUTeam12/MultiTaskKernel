@@ -4,14 +4,14 @@
 
 void task1() {
         while(1){
-                printf("task1\n");
+		printf("1\n");
         }
 }
 
 void task2() {
         while(1){
-                printf("task2\n");
-        }
+		printf("2\n");
+	}
 }
 
 int main() {

@@ -30,8 +30,6 @@ void init_kernel() {
 		semaphore[i].nst = UNDEFINED;
 		semaphore[i].task_list 	= NULLTASKID;
 	}
-	//DEBUG
-	printf("initTask\n");
 }
 
 /***********************************
@@ -41,22 +39,22 @@ void init_kernel() {
  **********************************/
 void* init_stack(TASK_ID_TYPE id) {
 	int *ssp;
-	// タスクのエントリポイントをtask_addrに設定
-	task_tab[id].task_addr = (void (*)(void))0x12345678; // TODO: 0x12345678は例なので後で消す
+	unsigned short int *ssptmp;
   	// スタックポインタsspをスタックの末尾に設定
   	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
  	// スタックにタスクのアドレスをプッシュ
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
 	// TODO: アドレス計算再チェック
-	ssp = (int *)(ssp - 1); // ssp のアドレスを 2 バイト減らす
-	*(ssp) = (unsigned short int)0;
+	ssptmp = (unsigned short int *)ssp;
+	*(--ssptmp) = (unsigned short int)0;
+	ssp = (int *)ssptmp;
 	//sspを15x4byte for register分減らす
-	ssp -= 30;	
+	for(int i = 0; i < 15; i++){
+		--ssp;
+	}
 	//ユーザースタックへのポインタを追加
 	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
-	//DEBUG
-	printf("init_stack\n");
 	return ssp;
 }
 
@@ -72,11 +70,14 @@ void set_task(void (*user_task_func)()) {
 			new_task = i;
 			task_tab[i].task_addr = user_task_func;
 			task_tab[i].status = TCB_ACTIVE;
-			task_tab[i].stack_ptr = init_stack(new_task);
-			ready = new_task;
-			//DEBUG
-			printf("set_task\n");
-			return;
+			void *ssp = init_stack(new_task);
+			task_tab[i].stack_ptr = ssp;
+			if(ready == NULLTASKID)
+			{
+				ready = i;
+			}else{
+				addq(ready,i);	
+			}
 		}
 	}
 }
@@ -88,7 +89,6 @@ void set_task(void (*user_task_func)()) {
 void begin_sch() {
 	curr_task = removeq(&ready);
 	init_timer();
-	printf("timer\n");
 	first_task();
 	//DEBUG
 	printf("begin_sch\n");
@@ -101,15 +101,13 @@ void begin_sch() {
  * @author 首藤・宗藤
  **********************************/
 void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
-	TASK_ID_TYPE next_task = task_tab[pointer].next; // キューの先頭から次のタスクを取得
+	TASK_ID_TYPE next = task_tab[pointer].next; // キューの先頭から次のタスクを取得
 	while(1){
-		if(next_task == NULLTASKID){
+		if(next == NULLTASKID){
 			task_tab[pointer].next = taskId; // キューの最後尾にタスクを追加	
-	//DEBUG
-	printf("addq\n");
 			break;
 		}else{
-			next_task = task_tab[next_task].next;
+			next = task_tab[next].next;
 		}
 	}
 }
