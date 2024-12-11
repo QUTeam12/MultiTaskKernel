@@ -1,20 +1,11 @@
+#define MTK
 #include "mtk_c.h"
-#include <stddef.h>
 #include <stdio.h>
+#include <stddef.h>
 
-extern void first_task();
-extern void init_timer();
-extern void pv_handler();
-extern void swtch();
-
-SEMAPHORE_TYPE	semaphore[NUMSEMAPHORE];
-TCB_TYPE	task_tab[NUMTASK+1];	// task_tab[1]からID=1のタスクを割り振る
-STACK_TYPE	stacks[NUMTASK];	// stacks[0]からID=1のタスクを割り振る
-
-TASK_ID_TYPE curr_task;	// 現在実行中のタスクのID
-TASK_ID_TYPE new_task;	// 現在登録作業中のタスクのID
-TASK_ID_TYPE next_task;	// 次に実行するタスクのID
-TASK_ID_TYPE ready;	// 実行待ちタスクのキューの先頭タスクのID
+void printdebug(int a){
+	printf("%d\n",a);
+}
 
 /***********************************
  * @brief カーネルの初期化
@@ -32,7 +23,7 @@ void init_kernel() {
 	// readyキューの初期化
 	ready = NULLTASKID;
 	// PVシステムコールの割り込み処理ルーチン(pv_handler)をTRAP1の割り込みベクタに登録
-	*(void(**) ())0x084 = pv_handler; // TODO: trap1のアドレスがあってるかわからない
+	*(void(**) ())0x084 =pv_handler; // TODO: trap1のアドレスがあってるかわからない
 	// セマフォのフィールド群の初期化
 	for(int i=0; i< NUMSEMAPHORE;i++){
 		semaphore[i].count = 1; // TODO: 初期のリソースアクセス状況は1だが正直わからん
@@ -48,16 +39,20 @@ void init_kernel() {
  **********************************/
 void* init_stack(TASK_ID_TYPE id) {
 	int *ssp;
+	unsigned short int *ssptmp;
   	// スタックポインタsspをスタックの末尾に設定
   	ssp = (int *)(&stacks[id-1].sstack[STKSIZE]);
  	// スタックにタスクのアドレスをプッシュ
   	*(--ssp) = (int)task_tab[id].task_addr;
 	//initial SRを0x0000に設定
 	// TODO: アドレス計算再チェック
-	ssp = (int *)(ssp - 1); // ssp のアドレスを 2 バイト減らす
-	*(ssp) = (unsigned short int)0;
+	ssptmp = (unsigned short int *)ssp;
+	*(--ssptmp) = (unsigned short int)0;
+	ssp = (int *)ssptmp;
 	//sspを15x4byte for register分減らす
-	ssp -= 30;	
+	for(int i = 0; i < 15; i++){
+		--ssp;
+	}
 	//ユーザースタックへのポインタを追加
 	*(--ssp) = (int)(&stacks[id -1].ustack[STKSIZE]);
 	return ssp;
@@ -75,10 +70,17 @@ void set_task(void (*user_task_func)()) {
 			new_task = i;
 			task_tab[i].task_addr = user_task_func;
 			task_tab[i].status = TCB_ACTIVE;
-			task_tab[i].stack_ptr = init_stack(new_task);
-			ready = new_task;
+			void *ssp = init_stack(new_task);
+			task_tab[i].stack_ptr = ssp;
+			if(ready == NULLTASKID)
+			{
+				ready = i;
+			}else{
+				addq(ready,i);	
+			}
 			return;
 		}
+			
 	}
 }
 
@@ -88,13 +90,8 @@ void set_task(void (*user_task_func)()) {
  **********************************/
 void begin_sch() {
 	curr_task = removeq(&ready);
-	printf("removeqおけ\r\n");
 	init_timer();
-	printf("init_timerおけ\r\n");
-//	*(char *)0x00d00039 = 'A'; // TODO: LED0 debug
 	first_task();
-	printf("first_taskおけ\r\n");
-//	*(char *)0x00d00039 = 'B'; // TODO: LED0 debug
 }
 
 /***********************************
@@ -104,13 +101,13 @@ void begin_sch() {
  * @author 首藤・宗藤
  **********************************/
 void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
-	TASK_ID_TYPE next_task = task_tab[pointer].next; // キューの先頭から次のタスクを取得
+	TASK_ID_TYPE next = task_tab[pointer].next; // キューの先頭から次のタスクを取得
 	while(1){
-		if(next_task == NULLTASKID){
+		if(next == NULLTASKID){
 			task_tab[pointer].next = taskId; // キューの最後尾にタスクを追加	
 			break;
 		}else{
-			next_task = task_tab[next_task].next;
+			next = task_tab[next].next;
 		}
 	}
 }
@@ -124,6 +121,7 @@ void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
 TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
 	TASK_ID_TYPE retval = *pointer;
 	*pointer = task_tab[*pointer].next;
+	task_tab[retval].next = NULLTASKID;
 	return retval;	
 }
 
@@ -136,6 +134,7 @@ void sleep(int ch){
 	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
 	sched();
 	swtch();
+	printf("sleep\n"); // TODO: debug
 }
 
 /***********************************
@@ -148,6 +147,7 @@ void wakeup(int ch){
 	if(task != NULLTASKID){
 		addq(ready, task);  // readyにtaskを追加
 	}
+	printf("wakeup\n"); // TODO: debug
 }
 
 /***********************************
@@ -161,6 +161,7 @@ void p_body(TASK_ID_TYPE semaphoreId){
 		// タスクを休眠状態に
 		sleep(semaphoreId);
 	}
+	printf("p_body\n"); // TODO: debug
 }
 
 /***********************************
@@ -173,6 +174,7 @@ void v_body(TASK_ID_TYPE semaphoreId){
 	if(semaphore[semaphoreId].count <= 0){
 		wakeup(semaphoreId);
 	}
+	printf("v_body\n"); // TODO: debug
 }
 
 /************************
