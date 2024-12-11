@@ -92,8 +92,6 @@ void begin_sch() {
 	curr_task = removeq(&ready);
 	init_timer();
 	first_task();
-	//DEBUG
-	printf("begin_sch\n");
 }
 
 /***********************************
@@ -103,7 +101,6 @@ void begin_sch() {
  * @author 首藤・宗藤
  **********************************/
 void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
-	printf("addq\n");
 	TASK_ID_TYPE next = task_tab[pointer].next; // キューの先頭から次のタスクを取得
 	while(1){
 		if(next == NULLTASKID){
@@ -125,8 +122,6 @@ TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
 	TASK_ID_TYPE retval = *pointer;
 	*pointer = task_tab[*pointer].next;
 	task_tab[retval].next = NULLTASKID;
-	//DEBUG
-	printf("removeq\n");
 	return retval;	
 }
 
@@ -192,12 +187,9 @@ void v_body(TASK_ID_TYPE semaphoreId){
 *************************/
 void sched(){
 	TASK_ID_TYPE a = removeq(&ready);
-	printf("next->%d\n",a);
 	next_task = a;
 	
 	if(next_task == NULLTASKID){
 		sched();
 	}
-	//DEBUG
-	printf("sched\n");
 }

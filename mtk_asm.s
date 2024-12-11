@@ -125,7 +125,7 @@ init_timer:
 	move.l #SYSCALL_NUM_RESET_TIMER,%D0
 	trap #0
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
-	move.w  #10000, %d1 /* Linux周期。10ms */
+	move.w  #100, %d1 /* Linux周期。10ms */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts
@@ -138,7 +138,8 @@ init_timer:
 swtch:
 	move.w 	%sr,-(%sp)	/*SRの値をスタックに積んでRTEで復帰できるようにする*/
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
-	move.l	%a7,-(%sp)	/*USPの値をスタックに積む*/
+	move.l %usp, %a0
+	move.l	%a0,-(%sp)	/*USPの値をスタックに積む*/
 	/*ここからしばらくSSPの保存*/
 	lea.l	task_tab, %a0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
