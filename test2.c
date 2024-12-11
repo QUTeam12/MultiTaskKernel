@@ -3,26 +3,26 @@
 #include <stdio.h>
 
 void task1() {
-	int i = 0;
-        while(1){
-	if(i == 10000){
-		printf("task1\n");
-		i = 0;
-	}else{
-		i++;
-	}
-        }
+  int i = 0;
+  while(1){
+	  if(i == 10000){
+		  printf("task1\n");
+		  i = 0;
+	  }else{
+		  i++;
+	  }
+  }
 }
 
 void task2() {
 	int i = 0;
-        while(1){
-	if(i == 10000){
-		printf("task2\n");
-		i = 0;
-	}else{
-		i++;
-	}
+  while(1){
+	  if(i == 10000){
+		  printf("task2\n");
+		  i = 0;
+	  }else{
+		  i++;
+	  }
 	}
 }
 

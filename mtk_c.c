@@ -33,7 +33,7 @@ void init_kernel() {
 }
 
 /***********************************
- * @brief ユーザタスクの用のスタック初期化
+ * @brief ユーザタスク用のスタック初期化
  * @param id: タスクID
  * @author 小紫
  **********************************/
@@ -134,8 +134,7 @@ void sleep(int ch){
 	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
 	sched();
 	swtch();
-	//DEBUG
-	printf("sleep\n");
+	printf("sleep\n"); // TODO: debug
 }
 
 /***********************************
@@ -148,8 +147,7 @@ void wakeup(int ch){
 	if(task != NULLTASKID){
 		addq(ready, task);  // readyにtaskを追加
 	}
-	//DEBUG
-	printf("wakeup\n");
+	printf("wakeup\n"); // TODO: debug
 }
 
 /***********************************
@@ -163,8 +161,7 @@ void p_body(TASK_ID_TYPE semaphoreId){
 		// タスクを休眠状態に
 		sleep(semaphoreId);
 	}
-	//DEBUG
-	printf("p_body\n");
+	printf("p_body\n"); // TODO: debug
 }
 
 /***********************************
@@ -177,8 +174,7 @@ void v_body(TASK_ID_TYPE semaphoreId){
 	if(semaphore[semaphoreId].count <= 0){
 		wakeup(semaphoreId);
 	}
-	//DEBUG
-	printf("v_body\n");
+	printf("v_body\n"); // TODO: debug
 }
 
 /************************

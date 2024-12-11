@@ -1,17 +1,21 @@
-.global first_task
-.extern	task_tab
 .include "equdefs.inc"
+
 .global P
 .global V
+.global first_task
 .global pv_handler
 .global hard_clock
 .global init_timer
 .global swtch
+
+.extern curr_task
+.extern next_task
+.extern ready
+.extern	task_tab
+
+.extern addq
 .extern p_body
 .extern v_body
-.extern curr_task
-.extern ready
-.extern addq
 .extern sched
 .extern stacks
 .extern next_task
@@ -149,7 +153,6 @@ swtch:
 	move.l %sp, (%a0)      |SSPを正しい位置に記録
 	
 	move.l next_task, curr_task	|curr_taskにnext_taskをいれた
-
 	lea.l	task_tab, %a0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#20, %d1
