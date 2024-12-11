@@ -54,6 +54,7 @@ extern void init_timer();
 extern void pv_handler();
 extern void swtch();
 #else
+extern void skipmt();
 extern void P(TASK_ID_TYPE taskId);
 extern void V(TASK_ID_TYPE taskId);
 #endif

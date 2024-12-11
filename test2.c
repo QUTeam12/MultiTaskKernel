@@ -2,7 +2,7 @@
 #include "mtk_c.h"
 #include <stdio.h>
 
-void task1(){
+void b_task1(){
 	printf("task1enter\n");
 	if(1 == NUMSEMAPHORE) V(1);
 	P(1);
@@ -13,7 +13,7 @@ void task1(){
 		P(1);
 	}
 }
-void task2(){
+void b_task2(){
 	printf("task2enter\n");
 	if(2 == NUMSEMAPHORE) V(1);
 	P(2);
@@ -24,7 +24,7 @@ void task2(){
 		P(2);
 	}
 }
-void task3(){
+void b_task3(){
 	printf("task3enter\n");
 	if(3 == NUMSEMAPHORE) V(1);
 	P(3);
@@ -36,12 +36,41 @@ void task3(){
 	}
 }
 
+void c_task1(){
+	int f = 0;
+	while(1){
+		printf("task1_a\n");
+		P(0);
+		printf("task1_b\n");
+		if (f==0) { skipmt(); f =1;}
+		printf("task1_c\n");
+		V(0);
+	}
+}
+
+void c_task2(){
+	while(1){
+		printf("task2_a\n");
+		P(0);
+		printf("task2_b\n");
+		V(0);
+	}
+}
+
+void c_task3(){
+	while(1){
+		printf("task3_a\n");
+		P(0);
+		printf("task3_b\n");
+		V(0);
+	}
+}
 
 int main() {
 	init_kernel();
-	set_task(task1);
-	set_task(task2);
-	set_task(task3);
+	set_task(c_task1);
+	set_task(c_task2);
+	set_task(c_task3);
 	begin_sch();
 	return 0;
 }

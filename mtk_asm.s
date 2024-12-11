@@ -7,6 +7,7 @@
 .global hard_clock
 .global init_timer
 .global swtch
+.global skipmt
 .extern p_body
 .extern v_body
 .extern curr_task
@@ -19,7 +20,16 @@
 
 .section .text
 .even
-
+***********************
+**skipmt
+*********************
+skipmt:
+	
+	movem.l %d0,-(%sp)
+	move.l #5, %d0
+	trap #0
+	movem.l (%sp)+, %d0
+	rts
 
 *********************
 ** debug
@@ -127,7 +137,7 @@ init_timer:
 	move.l #SYSCALL_NUM_RESET_TIMER,%D0
 	trap #0
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
-	move.w  #10000, %d1 /* Linux周期。10ms */
+	move.w  #100, %d1 /* Linux周期。10ms */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts
