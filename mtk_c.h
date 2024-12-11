@@ -38,7 +38,7 @@ typedef struct {
 } STACK_TYPE;
 #ifdef MTK
 //大域変数
-SEMAPHORE_TYPE  semaphore[NUMSEMAPHORE];
+SEMAPHORE_TYPE  semaphore[NUMSEMAPHORE + 1];
 TCB_TYPE        task_tab[NUMTASK+1];    // task_tab[1]からID=1のタスクを割り振る
 STACK_TYPE      stacks[NUMTASK];        // stacks[0]からID=1のタスクを割り振る
 
@@ -53,6 +53,9 @@ extern void first_task();
 extern void init_timer();
 extern void pv_handler();
 extern void swtch();
+#else
+extern void P(TASK_ID_TYPE taskId);
+extern void V(TASK_ID_TYPE taskId);
 #endif
 // 関数のプロトタイプ宣言
 void init_kernel();

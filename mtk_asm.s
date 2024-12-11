@@ -55,10 +55,11 @@ first_task:
 ** 製作者: 宗藤 
 *********************
 P:
-	move.l  %sp,%d1		| %d1 = スタックから取り出した引数
- 	addi.l 	#4, %d1
+ 	add.l 	#4, %sp
+	move.l  (%sp),%d1		| %d1 = スタックから取り出した引数
 	move.l 	#0,%d0		| %d0 = Pシステムコールの ID(=0)
 	trap #1
+	sub.l #4, %sp
 	rts
 
 ********************
@@ -69,10 +70,11 @@ P:
 ** 製作者: 宗藤 
 *********************
 V:
-	move.l 	%sp,%d1		| %d1 = スタックから取り出した引数
- 	addi.l 	#4, %d1
+ 	add.l 	#4, %sp
+	move.l 	(%sp),%d1		| %d1 = スタックから取り出した引数
 	move.l 	#1,%d0		| %d0 = Vシステムコールの ID(=1)
 	trap #1
+	sub.l #4, %sp
 	rts
  
 ********************
@@ -125,7 +127,7 @@ init_timer:
 	move.l #SYSCALL_NUM_RESET_TIMER,%D0
 	trap #0
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
-	move.w  #100, %d1 /* Linux周期。10ms */
+	move.w  #10000, %d1 /* Linux周期。10ms */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts
