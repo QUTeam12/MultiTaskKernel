@@ -90,7 +90,6 @@ void set_task(void (*user_task_func)()) {
  **********************************/
 void begin_sch() {
 	curr_task = removeq(&ready);
-	
 	init_timer();
 	first_task();
 }
@@ -102,12 +101,14 @@ void begin_sch() {
  * @author 首藤・宗藤
  **********************************/
 void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId){
-	TASK_ID_TYPE next = task_tab[pointer].next; // キューの先頭から次のタスクを取得
+	TASK_ID_TYPE currentPointer = pointer;
+	TASK_ID_TYPE next = task_tab[currentPointer].next; // キューの先頭から次のタスクを取得
 	while(1){
 		if(next == NULLTASKID){
-			task_tab[pointer].next = taskId; // キューの最後尾にタスクを追加	
+			task_tab[currentPointer].next = taskId; // キューの最後尾にタスクを追加	
 			break;
 		}else{
+			currentPointer = next;
 			next = task_tab[next].next;
 		}
 	}
@@ -134,7 +135,12 @@ TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer){
 void sleep(int ch){
 	//DEBUG
 	printf("sleep\n");
-	addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
+	if(semaphore[ch].task_list == NULLTASKID){
+		semaphore[ch].task_list = curr_task;
+	}else{
+		addq(semaphore[ch].task_list, curr_task);  // セマフォにcurr_taskを追加
+	}
+	printf("semaphore%d\n",semaphore[ch].task_list);
 	sched();
 	swtch();
 }
@@ -148,6 +154,7 @@ void wakeup(int ch){
 	//DEBUG
 	printf("wakeup\n");
 	int task = removeq(&semaphore[ch].task_list); // task = セマフォから取り出したタスク
+	printf("semaphore%d\n",task);
 	if(task != NULLTASKID){
 		addq(ready, task);  // readyにtaskを追加
 	}
