@@ -26,7 +26,8 @@
 skipmt:
 	
 	movem.l %d0,-(%sp)
-	move.l #5, %d0
+	move.b #'S',LED4
+	move.l #5,%d0
 	trap #0
 	movem.l (%sp)+, %d0
 	rts
