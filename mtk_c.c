@@ -7,6 +7,10 @@ void printdebug(int a){
 	printf("%d\n",a);
 }
 
+void print_semaphore(){
+	printf("s0:");
+
+}
 /***********************************
  * @brief カーネルの初期化
  * @author 小紫
@@ -30,6 +34,9 @@ void init_kernel() {
 		semaphore[i].nst = UNDEFINED;
 		semaphore[i].task_list 	= NULLTASKID;
 	}
+	/*タスクの同期処理用*/
+	semaphore[0].count =1;
+	semaphore[1].count=0;
 }
 
 /***********************************

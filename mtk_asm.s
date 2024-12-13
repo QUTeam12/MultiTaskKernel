@@ -139,6 +139,7 @@ init_timer:
 	trap #0
 	move.l #SYSCALL_NUM_SET_TIMER, %D0
 	move.w  #100, %d1 /* Linux周期。10ms */
+	** move.w  #0x2710, %d1 /* 動作確認用。1sec。 */
 	move.l  #hard_clock, %d2
 	trap #0
 	rts
