@@ -10,6 +10,7 @@
 	.equ SYSCALL_NUM_PUTSTRING, 	2
 	.equ SYSCALL_NUM_RESET_TIMER, 	3
 	.equ SYSCALL_NUM_SET_TIMER, 	4
+	.equ SYSCALL_NUM_SKIPMT, 	5
 ***************
 *** レジスタ群の先頭
 ***************

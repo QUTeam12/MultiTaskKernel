@@ -1,5 +1,6 @@
 .include "equdefs.inc"
-
+.global skipmt
+.global first_task
 .global P
 .global V
 .global first_task
@@ -10,20 +11,28 @@
 
 .extern curr_task
 .extern next_task
-.extern ready
 .extern	task_tab
+.extern ready
 
-.extern addq
 .extern p_body
 .extern v_body
+.extern addq
 .extern sched
 .extern stacks
-.extern next_task
 .extern printdebug
 
 .section .text
 .even
 
+***********************
+**skipmt
+*********************
+skipmt:	
+	movem.l %d0, -(%sp)
+	move.l #SYSCALL_NUM_SKIPMT, %d0
+	trap #0
+	movem.l (%sp)+, %d0
+	rts
 
 *********************
 ** debug
@@ -59,10 +68,11 @@ first_task:
 ** 製作者: 宗藤 
 *********************
 P:
-	move.l  %sp,%d1		| %d1 = スタックから取り出した引数
- 	addi.l 	#4, %d1
+ 	add.l 	#4, %sp
+	move.l  (%sp),%d1		| %d1 = スタックから取り出した引数
 	move.l 	#0,%d0		| %d0 = Pシステムコールの ID(=0)
 	trap #1
+	sub.l #4, %sp
 	rts
 
 ********************
@@ -73,10 +83,11 @@ P:
 ** 製作者: 宗藤 
 *********************
 V:
-	move.l 	%sp,%d1		| %d1 = スタックから取り出した引数
- 	addi.l 	#4, %d1
+ 	add.l 	#4, %sp
+	move.l 	(%sp),%d1		| %d1 = スタックから取り出した引数
 	move.l 	#1,%d0		| %d0 = Vシステムコールの ID(=1)
 	trap #1
+	sub.l #4, %sp
 	rts
  
 ********************
@@ -113,7 +124,8 @@ pv_handler_end:
 hard_clock:
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.l  curr_task, -(%sp)
-	move.l  ready, -(%sp)
+	lea.l ready, %a0
+	move.l  %a0, -(%sp)
 	jsr     addq
  	add.l  #8, %sp
 	jsr     sched

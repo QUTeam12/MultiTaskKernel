@@ -1,6 +1,6 @@
 #define NULLTASKID 0	// キューの終端
 #define NUMSEMAPHORE 3	// セマフォの数。任意。
-#define NUMTASK 2	// 最大タスク数。任意。
+#define NUMTASK 5	// 最大タスク数。任意。
 #define STKSIZE 8000	// スタックサイズ
 #define UNDEFINED 0	// int型フィールドの初期化用
 
@@ -53,13 +53,17 @@ extern void first_task();
 extern void init_timer();
 extern void pv_handler();
 extern void swtch();
+#else
+extern void skipmt();
+extern void P(TASK_ID_TYPE taskId);
+extern void V(TASK_ID_TYPE taskId);
 #endif
 // 関数のプロトタイプ宣言
 void init_kernel();
 void* init_stack(TASK_ID_TYPE id);
 void set_task(void (*user_task_func)());
 void begin_sch();
-void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId);
+void addq(TASK_ID_TYPE *pointer, TASK_ID_TYPE taskId);
 TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer);
 void sleep(int ch);
 void wakeup(int ch);
