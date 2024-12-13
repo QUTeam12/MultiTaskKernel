@@ -1,9 +1,9 @@
 .include "equdefs.inc"
-
 .global skipmt
 .global first_task
 .global P
 .global V
+.global first_task
 .global pv_handler
 .global hard_clock
 .global init_timer
@@ -165,7 +165,6 @@ swtch:
 	move.l %sp, (%a0)      |SSPを正しい位置に記録
 	
 	move.l next_task, curr_task	|curr_taskにnext_taskをいれた
-
 	lea.l	task_tab, %a0	| TCB配列の先頭アドレス
 	move.l	curr_task, %d1	| 現在のタスクID
 	mulu.w	#20, %d1
