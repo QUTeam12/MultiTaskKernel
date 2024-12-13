@@ -1,32 +1,35 @@
-.global first_task
-.extern	task_tab
 .include "equdefs.inc"
+
+.global skipmt
+.global first_task
 .global P
 .global V
 .global pv_handler
 .global hard_clock
 .global init_timer
 .global swtch
-.global skipmt
+
+.extern curr_task
+.extern next_task
+.extern	task_tab
+.extern ready
+
 .extern p_body
 .extern v_body
-.extern curr_task
-.extern ready
 .extern addq
 .extern sched
 .extern stacks
-.extern next_task
 .extern printdebug
 
 .section .text
 .even
+
 ***********************
 **skipmt
 *********************
-skipmt:
-	
-	movem.l %d0,-(%sp)
-	move.l #5, %d0
+skipmt:	
+	movem.l %d0, -(%sp)
+	move.l #SYSCALL_NUM_SKIPMT, %d0
 	trap #0
 	movem.l (%sp)+, %d0
 	rts
@@ -121,7 +124,8 @@ pv_handler_end:
 hard_clock:
 	movem.l %d0-%d7/%a0-%a6, -(%sp)
 	move.l  curr_task, -(%sp)
-	move.l  ready, -(%sp)
+	lea.l ready, %a0
+	move.l  %a0, -(%sp)
 	jsr     addq
  	add.l  #8, %sp
 	jsr     sched

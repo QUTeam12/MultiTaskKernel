@@ -63,7 +63,7 @@ void init_kernel();
 void* init_stack(TASK_ID_TYPE id);
 void set_task(void (*user_task_func)());
 void begin_sch();
-void addq(TASK_ID_TYPE pointer, TASK_ID_TYPE taskId);
+void addq(TASK_ID_TYPE *pointer, TASK_ID_TYPE taskId);
 TASK_ID_TYPE removeq(TASK_ID_TYPE *pointer);
 void sleep(int ch);
 void wakeup(int ch);
